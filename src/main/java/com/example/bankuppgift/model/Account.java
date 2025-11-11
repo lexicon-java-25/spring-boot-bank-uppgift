@@ -1,14 +1,29 @@
 package com.example.bankuppgift.model;
 
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "accounts")
 public class Account
 {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String ownerName;
+
+    @Column(nullable = false)
     private double balance;
 
-    public Account(Long id, String ownerName, double balance)
+
+    public Account()
     {
-        this.id = id;
+
+    }
+    public Account(String ownerName, double balance)
+    {
         this.ownerName = ownerName;
         this.balance = balance;
     }

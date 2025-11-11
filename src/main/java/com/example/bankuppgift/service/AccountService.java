@@ -6,40 +6,46 @@ import com.example.bankuppgift.dto.TransferRequest;
 import com.example.bankuppgift.exception.InsufficientFundsException;
 import com.example.bankuppgift.exception.ResourceNotFoundException;
 import com.example.bankuppgift.model.Account;
+import com.example.bankuppgift.model.Transaction;
+import com.example.bankuppgift.repository.AccountRepository;
+import com.example.bankuppgift.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class AccountService
 {
 
-    private final List<Account> accounts = new ArrayList<>();
+    private final AccountRepository repository;
+    private final TransactionRepository transactionRepository;
 
-    private final AtomicLong idCounter = new AtomicLong(1);
+
+
+    public AccountService(AccountRepository repository, TransactionRepository transactionRepository) {
+        this.repository = repository;
+        this.transactionRepository = transactionRepository;
+    }
+
+
 
 
     public List<Account> getAll()
     {
-        return accounts;
+        return repository.findAll();
     }
 
 
     public Account create(AccountRequest request)
     {
-        Account account = new Account(idCounter.getAndIncrement(), request.getOwnerName(), request.getBalance());
-        accounts.add(account);
-        return account;
+        Account account = new Account(request.getOwnerName(), request.getBalance());
+        return repository.save(account);
     }
 
 
     public Account getById(Long id)
     {
-        return accounts.stream()
-                .filter(a -> a.getId().equals(id))
-                .findFirst()
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
     }
 
@@ -55,6 +61,7 @@ public class AccountService
 
         from.setBalance(from.getBalance() - request.getAmount());
         to.setBalance(to.getBalance() + request.getAmount());
+        transactionRepository.save(new Transaction(from.getOwnerName(), to.getOwnerName(), request.getAmount()));
     }
 
 
