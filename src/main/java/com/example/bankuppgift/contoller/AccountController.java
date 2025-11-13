@@ -7,6 +7,10 @@ import com.example.bankuppgift.model.Transaction;
 import com.example.bankuppgift.service.AccountService;
 import com.example.bankuppgift.service.TransactionService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,5 +63,22 @@ public class AccountController
         return transactionService.getAllTransactions();
     }
 
+    @GetMapping("/search/{name}")
+    public ResponseEntity<List<Account>> search(@PathVariable String name)
+    {
+        return ResponseEntity.ok(service.searchByName(name));
+    }
+
+    @GetMapping("/findbybalance/{balance}")
+    public ResponseEntity<Page<Account>> search(@PathVariable double balance,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "1") int pageSize,
+                                                @RequestParam(defaultValue = "balance") String sortBy
+    )
+    {
+
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
+        return ResponseEntity.ok(service.findByMinBalance(balance, pageable));
+    }
 
 }

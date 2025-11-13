@@ -9,6 +9,8 @@ import com.example.bankuppgift.model.Account;
 import com.example.bankuppgift.model.Transaction;
 import com.example.bankuppgift.repository.AccountRepository;
 import com.example.bankuppgift.repository.TransactionRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -64,5 +66,14 @@ public class AccountService
         transactionRepository.save(new Transaction(from.getOwnerName(), to.getOwnerName(), request.getAmount()));
     }
 
+    public List<Account> searchByName(String name)
+    {
+        return repository.searchByName(name);
+    }
+
+    public Page<Account> findByMinBalance(double minBalance, Pageable pageable)
+    {
+        return repository.findByMinBalance(minBalance, pageable);
+    }
 
 }
